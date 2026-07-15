@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>Ficha del Asesor de Investigación — Postgrado PUCMM</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Sans+3:wght@300;400;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:#f0ede8;padding:24px;min-height:100vh}
+.page{max-width:940px;margin:0 auto;margin-bottom:100px}
+
+/* HEADER GLOBAL */
+.global-header{background:#fff;padding:0 0 0;box-shadow:0 4px 32px rgba(0,0,0,0.13);margin-bottom:20px}
+.accent-bar{height:6px;background:linear-gradient(to right,#4F7CAC 60%,#D9A83E 100%)}
+.doc-header{padding:20px 36px 16px;border-bottom:2px solid #4F7CAC}
+.university-name{font-size:11pt;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#4F7CAC;text-align:center}
+.decanato{font-size:9pt;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#D9A83E;text-align:center;margin-top:2px}
+.doc-title{font-family:'Playfair Display',serif;font-size:18pt;color:#4F7CAC;text-align:center;margin-top:8px;line-height:1.2}
+
+/* COORDINADOR STRIP */
+.coord-strip{background:#fff;padding:14px 36px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;border-bottom:1px solid #d0d8e2}
+.field-group{display:flex;flex-direction:column;gap:2px}
+.field-label{font-size:7pt;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#444444;margin-bottom:2px}
+.field-label .req{color:#C97066;font-weight:700}
+input[type=text],input[type=email],input[type=tel],select,textarea{font-family:'Source Sans 3',sans-serif;font-size:9.5pt;color:#111111;border:none;border-bottom:1.5px solid #b0b8c4;background:transparent;outline:none;width:100%;padding:3px 4px;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-bottom-color:#D9A83E;background:#fffdf7}
+
+/* ASESOR CARD */
+.asesor-card{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.08);margin-bottom:20px;border-radius:6px;overflow:hidden;border:1px solid #d0d8e2}
+.asesor-card-header{background:#4F7CAC;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.asesor-card-title{color:#fff;font-size:11pt;font-weight:600;display:flex;align-items:center;gap:10px}
+.asesor-num{background:#D9A83E;color:#fff;font-size:9pt;font-weight:600;padding:2px 9px;border-radius:12px}
+.asesor-name-preview{font-size:9pt;color:#CFE0F0;font-weight:400}
+.asesor-card-actions{display:flex;gap:8px;align-items:center}
+.collapse-btn{background:none;border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:3px;padding:3px 10px;font-size:8.5pt;cursor:pointer;font-family:'Source Sans 3',sans-serif}
+.collapse-btn:hover{background:rgba(255,255,255,0.1)}
+.del-asesor-btn{background:none;border:1px solid rgba(201,112,102,0.5);color:#D98A80;border-radius:3px;padding:3px 10px;font-size:8.5pt;cursor:pointer;font-family:'Source Sans 3',sans-serif}
+.del-asesor-btn:hover{background:rgba(201,112,102,0.1)}
+.asesor-body{padding:20px 24px;display:block}
+.asesor-body.collapsed{display:none}
+
+/* SECTION TITLES */
+.section-title{font-size:8pt;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;background:#4F7CAC;border-left:4px solid #D9A83E;padding:5px 12px;margin:16px 0 10px}
+
+/* DATOS GRID */
+.datos-grid{display:grid;grid-template-columns:150px 1fr;gap:0;border:1px solid #d0d8e2;border-radius:4px;overflow:hidden}
+.foto-cell{border-right:1px solid #d0d8e2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;gap:6px;background:#f7f9fb}
+.foto-preview{width:120px;height:140px;border:1.5px dashed #b0b8c4;border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;background:#edf1f6}
+.foto-preview img{width:100%;height:100%;object-fit:cover;display:none}
+.foto-placeholder{font-size:8.5pt;color:#7a8fa6;text-align:center;line-height:1.4;padding:6px}
+.foto-btn{font-size:7.5pt;color:#4F7CAC;border:1px solid #b0b8c4;border-radius:3px;padding:3px 8px;cursor:pointer;background:#fff;font-family:'Source Sans 3',sans-serif}
+.foto-btn:hover{background:#edf1f6}
+.datos-fields{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.field-row{display:grid;gap:10px}
+.field-row.two{grid-template-columns:1fr 1fr}
+.field-row.three{grid-template-columns:1fr 1fr 1fr}
+
+/* TABLES */
+.data-table{width:100%;border-collapse:collapse;font-size:9pt}
+.data-table thead th{background:#4F7CAC;color:#fff;padding:6px 8px;font-size:7.5pt;font-weight:600;text-align:left;border-right:1px solid #6E9BC7}
+.data-table thead th:last-child{border-right:none;width:36px}
+.data-table tbody tr{border-bottom:1px solid #dde3eb}
+.data-table tbody tr:nth-child(even){background:#f7f9fb}
+.data-table tbody td{padding:3px 5px;border-right:1px solid #dde3eb;vertical-align:middle;color:#111111}
+.data-table tbody td:last-child{border-right:none;text-align:center}
+.data-table tbody td input,.data-table tbody td select{font-size:9pt;padding:2px 3px}
+.row-num{font-size:8pt;color:#7a8fa6;font-weight:600;text-align:center;width:22px}
+.add-row-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 10px;font-size:8pt;font-family:'Source Sans 3',sans-serif;color:#4F7CAC;border:1px solid #b0b8c4;border-radius:3px;cursor:pointer;background:#f7f9fb}
+.add-row-btn:hover{background:#edf1f6;border-color:#4F7CAC}
+.del-row-btn{background:none;border:none;cursor:pointer;color:#b0b8c4;font-size:13pt;line-height:1;padding:1px 3px}
+.del-row-btn:hover{color:#C97066}
+
+/* FIRMA */
+.firma-tabs{display:flex;gap:4px;margin-bottom:8px}
+.firma-tab{padding:4px 12px;font-size:8pt;font-family:'Source Sans 3',sans-serif;cursor:pointer;border:1px solid #b0b8c4;border-radius:3px;background:#f7f9fb;color:#4F7CAC}
+.firma-tab.active{background:#4F7CAC;color:#fff;border-color:#4F7CAC}
+.firma-panel{display:none}.firma-panel.active{display:block}
+.firma-canvas{border:1.5px dashed #b0b8c4;border-radius:4px;cursor:crosshair;touch-action:none;background:#fff;width:100%;height:110px}
+.firma-tools{display:flex;gap:8px;margin-top:5px;align-items:center}
+.firma-tools button{font-family:'Source Sans 3',sans-serif;font-size:7.5pt;padding:3px 8px;border:1px solid #b0b8c4;border-radius:3px;cursor:pointer;background:#f7f9fb}
+.firma-img-preview{max-height:110px;max-width:100%;border:1.5px dashed #b0b8c4;border-radius:4px;display:none;margin-top:6px}
+
+/* ADJUNTOS */
+.adjuntos-area{border:2px dashed #b0b8c4;border-radius:6px;padding:14px;text-align:center;cursor:pointer;background:#f7f9fb;transition:border-color .15s}
+.adjuntos-area:hover{border-color:#D9A83E;background:#fffdf7}
+.adjuntos-area p{font-size:9pt;color:#7a8fa6}
+.adjuntos-area span{font-size:8pt;color:#b0b8c4}
+.adjuntos-list{margin-top:10px;display:flex;flex-direction:column;gap:16px}
+.adj-item{display:flex;flex-direction:column;gap:8px;padding:10px;background:#f0f4f8;border-radius:6px;font-size:8pt;color:#4F7CAC}
+.adj-item-header{display:flex;align-items:center;justify-content:space-between}
+.adj-item-header span{font-weight:600}
+.adj-del-btn{background:none;border:none;cursor:pointer;color:#b0b8c4;font-size:14pt;line-height:1}
+.adj-del-btn:hover{color:#C97066}
+/* Editor de página */
+.adj-editor-wrap{display:flex;flex-direction:column;gap:6px}
+.adj-editor-label{font-size:7.5pt;color:#7a8fa6;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.adj-page-frame{position:relative;background:#fff;border:2px solid #4F7CAC;border-radius:2px;overflow:hidden;cursor:grab;user-select:none;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.adj-page-frame:active{cursor:grabbing}
+.adj-page-frame canvas{display:block}
+.adj-page-overlay{position:absolute;inset:0;pointer-events:none;border:3px solid rgba(217,168,62,0)}
+.adj-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.adj-ctrl-btn{font-family:'Source Sans 3',sans-serif;font-size:7.5pt;padding:4px 10px;border:1px solid #b0b8c4;border-radius:3px;cursor:pointer;background:#fff;color:#4F7CAC}
+.adj-ctrl-btn:hover{background:#edf1f6;border-color:#4F7CAC}
+.adj-zoom-label{font-size:7.5pt;color:#7a8fa6}
+.adj-zoom-range{width:100px}
+
+/* ADD ASESOR BTN */
+.add-asesor-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;border:2px dashed #b0b8c4;border-radius:6px;font-family:'Source Sans 3',sans-serif;font-size:11pt;font-weight:600;color:#4F7CAC;cursor:pointer;transition:all .15s;margin-bottom:20px}
+.add-asesor-btn:hover{border-color:#D9A83E;color:#D9A83E;background:#fffdf7}
+
+/* NOTAS */
+.notas-box{background:#FDF6E3;border-left:3px solid #D9A83E;padding:10px 14px;font-size:8.5pt;color:#8A6A2E;line-height:1.5;margin-top:14px;border-radius:0 4px 4px 0}
+
+/* SEND BTN */
+.send-btn{position:fixed;bottom:24px;right:24px;background:#4F7CAC;color:#fff;border:none;border-radius:8px;padding:13px 28px;font-family:'Source Sans 3',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 16px rgba(79,124,172,.3);display:flex;align-items:center;gap:8px;transition:background .15s;z-index:100}
+.send-btn:hover{background:#D9A83E}
+
+/* VALIDACIÓN / CAMPOS OBLIGATORIOS */
+.field-error{border-bottom-color:#C97066 !important;background:#FBEAE7 !important;box-shadow:0 0 0 2px rgba(201,112,102,0.15)}
+.firma-panel.field-error{outline:2px solid #C97066;outline-offset:4px;border-radius:6px;background:#FBEAE7;padding:6px;animation:pulseError 1.2s ease-in-out 2}
+@keyframes pulseError{0%,100%{box-shadow:0 0 0 0 rgba(201,112,102,0.35)}50%{box-shadow:0 0 0 8px rgba(201,112,102,0)}}
+.otra-facultad-wrap{display:none;margin-top:4px}
+.otra-facultad-wrap.show{display:block}
+.adjuntos-area.field-error{border-color:#C97066;background:#FBEAE7;animation:pulseError 1.2s ease-in-out 2}
+</style>
+<script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init({publicKey:"rEXqEhGtvHco_F1Zx"});</script>
+</head>
+<body>
+
+<!-- GLOBAL HEADER -->
+<div class="global-header">
+  <div class="accent-bar"></div>
+  <div class="doc-header">
+    <div class="university-name">Pontificia Universidad Católica Madre y Maestra</div>
+    <div class="decanato">Decanato de Postgrado</div>
+    <div class="doc-title">Ficha del Asesor de Investigación de Postgrado</div>
+  </div>
+  <div class="coord-strip">
+    <div class="field-group">
+      <div class="field-label">Coordinador responsable <span class="req">*</span></div>
+      <input type="text" id="coordNombre" placeholder="Nombre completo">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Programa(s) que Asesora</div>
+      <input type="text" id="coordPrograma" placeholder="Ej: Maestría en Derecho, Maestría en Psicología...">
+    </div>
+    <div class="field-group">
+      <div class="field-label">Fecha</div>
+      <input type="date" id="coordFecha">
+    </div>
+  </div>
+</div>
+
+<!-- ASESORES CONTAINER -->
+<div id="asesoresContainer"></div>
+
+<!-- ADD ASESOR -->
+<button class="add-asesor-btn" onclick="addAsesor()">+ Agregar otro asesor</button>
+
+<!-- SEND -->
+<button class="send-btn" onclick="enviar()">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+  Enviar Fichas
+</button>
+
+<script>
+let asesorCount = 0;
+const gradoOpts   = ['Licenciatura','Ingeniería','Especialidad','Maestría','Doctorado'];
+const modalOpts   = ['Curso','Taller','Seminario','Diplomado','Simposio','Congreso','Otro'];
+const expOpts     = ['Investigador','Asesor de investigación','Jurado de Tesis','Docente de investigación','Profesional de su ámbito','Otro'];
+const facultadOpts = ['Ciencias de la Salud','Ciencias Sociales, Humanidades y Artes','Ciencias Económicas y Administrativas','Ciencias e Ingeniería','Otra (especificar)'];
+
+// ── ADD ASESOR ──
+function addAsesor(){
+  asesorCount++;
+  const id = asesorCount;
+  const div = document.createElement('div');
+  div.className = 'asesor-card';
+  div.id = `asesor-${id}`;
+  div.innerHTML = buildAsesorHTML(id);
+  document.getElementById('asesoresContainer').appendChild(div);
+  initCanvas(id);
+  // init 3 rows each table
+  ['Formacion','Estudios','Experiencia','Publicaciones'].forEach(t => {
+    for(let i=0;i<3;i++) addTableRow(id, t);
+  });
+  updatePreview(id);
+}
+
+function buildAsesorHTML(id){
+  return `
+  <div class="asesor-card-header" onclick="toggleAsesor(${id})">
+    <div class="asesor-card-title">
+      <span class="asesor-num">Asesor ${id}</span>
+      <span class="asesor-name-preview" id="preview-${id}">Sin nombre aún</span>
+    </div>
+    <div class="asesor-card-actions" onclick="event.stopPropagation()">
+      <button class="collapse-btn" onclick="toggleAsesor(${id})">Minimizar ▲</button>
+      <button class="del-asesor-btn" onclick="delAsesor(${id})">✕ Eliminar</button>
+    </div>
+  </div>
+  <div class="asesor-body" id="body-${id}">
+
+    <!-- DATOS PERSONALES -->
+    <div class="section-title">Datos Personales</div>
+    <div class="datos-grid">
+      <div class="foto-cell">
+        <div class="foto-preview" onclick="document.getElementById('foto-input-${id}').click()">
+          <img id="foto-img-${id}" alt="Foto">
+          <div class="foto-placeholder" id="foto-ph-${id}">📷<br>Clic para<br>cargar foto</div>
+        </div>
+        <input type="file" id="foto-input-${id}" accept="image/*" style="display:none" onchange="cargarFoto(${id},this)">
+        <button class="foto-btn" onclick="document.getElementById('foto-input-${id}').click()">Cargar foto</button>
+      </div>
+      <div class="datos-fields">
+        <div class="field-row">
+          <div class="field-group">
+            <div class="field-label">Nombre y Apellidos <span class="req">*</span></div>
+            <input type="text" id="nombre-${id}" placeholder="Nombre completo" oninput="updatePreview(${id});limpiarErrorCampo(this)">
+          </div>
+        </div>
+        <div class="field-row two">
+          <div class="field-group"><div class="field-label">Cédula <span class="req">*</span></div><input type="text" id="cedula-${id}" placeholder="000-0000000-0" oninput="limpiarErrorCampo(this)"></div>
+          <div class="field-group"><div class="field-label">ID Institucional</div><input type="text" id="idInst-${id}" placeholder="ID"></div>
+        </div>
+        <div class="field-row two">
+          <div class="field-group"><div class="field-label">Teléfono <span class="req">*</span></div><input type="tel" id="tel-${id}" placeholder="000-000-0000" oninput="limpiarErrorCampo(this)"></div>
+          <div class="field-group"><div class="field-label">Correo Institucional <span class="req">*</span></div><input type="email" id="correo-${id}" placeholder="correo@pucmm.edu.do" oninput="limpiarErrorCampo(this)"></div>
+        </div>
+        <div class="field-row two">
+          <div class="field-group"><div class="field-label">Tipo de Asesor <span class="req">*</span></div><input type="text" id="tipo-${id}" placeholder="Metodológico, De Contenido, Ambos..." oninput="limpiarErrorCampo(this)"></div>
+          <div class="field-group">
+            <div class="field-label">Facultad <span class="req">*</span></div>
+            <select id="facultad-${id}" onchange="onFacultadChange(${id});limpiarErrorCampo(this)">
+              <option value="" selected disabled>Selecciona una facultad</option>
+              ${facultadOpts.map(o=>`<option value="${o}">${o}</option>`).join('')}
+            </select>
+            <div class="otra-facultad-wrap" id="otraFacultadWrap-${id}">
+              <input type="text" id="facultadOtra-${id}" placeholder="Especifica la facultad" oninput="limpiarErrorCampo(document.getElementById('facultad-${id}'))">
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group"><div class="field-label">Programa Académico en que Asesora <span class="req">*</span></div><input type="text" id="programa-${id}" placeholder="Maestría / Doctorado en..." oninput="limpiarErrorCampo(this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMACIÓN ACADÉMICA -->
+    <div class="section-title">Formación Académica</div>
+    <table class="data-table">
+      <thead><tr><th style="width:22px">#</th><th style="width:130px">Grado</th><th>Área de Especialización</th><th style="width:65px">Año</th><th>Institución</th><th style="width:34px"></th></tr></thead>
+      <tbody id="tblFormacion-${id}"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addTableRow(${id},'Formacion')">+ Agregar fila</button>
+
+    <!-- OTROS ESTUDIOS -->
+    <div class="section-title">Otros Estudios en el Área Investigativa</div>
+    <table class="data-table">
+      <thead><tr><th style="width:22px">#</th><th style="width:110px">Modalidad</th><th>Certificación / Descripción</th><th style="width:65px">Año</th><th>Institución</th><th style="width:34px"></th></tr></thead>
+      <tbody id="tblEstudios-${id}"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addTableRow(${id},'Estudios')">+ Agregar fila</button>
+
+    <!-- EXPERIENCIA -->
+    <div class="section-title">Experiencia Investigativa y Profesional</div>
+    <table class="data-table">
+      <thead><tr><th style="width:22px">#</th><th>Función / Cargo</th><th style="width:80px">Años</th><th>Institución(es)</th><th style="width:34px"></th></tr></thead>
+      <tbody id="tblExperiencia-${id}"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addTableRow(${id},'Experiencia')">+ Agregar fila</button>
+
+    <!-- PUBLICACIONES -->
+    <div class="section-title">Publicaciones Científicas o Académicas</div>
+    <table class="data-table">
+      <thead><tr><th style="width:22px">#</th><th>Título de la publicación</th><th style="width:150px">Revista o Editorial</th><th style="width:65px">Año</th><th style="width:34px"></th></tr></thead>
+      <tbody id="tblPublicaciones-${id}"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addTableRow(${id},'Publicaciones')">+ Agregar fila</button>
+
+    <!-- FIRMA -->
+    <div class="section-title">Firma del Asesor <span style="color:#e08a3c">*</span></div>
+    <div class="firma-tabs">
+      <button class="firma-tab active" id="ftab-draw-${id}" onclick="switchFirma(${id},'draw')">✏️ Dibujar firma</button>
+      <button class="firma-tab" id="ftab-upload-${id}" onclick="switchFirma(${id},'upload')">📎 Cargar imagen</button>
+    </div>
+    <div class="firma-panel active" id="fpanel-draw-${id}">
+      <canvas class="firma-canvas" id="canvas-${id}" width="800" height="110"></canvas>
+      <div class="firma-tools">
+        <button onclick="clearCanvas(${id})">Limpiar</button>
+        <label style="font-size:7.5pt;color:#7a8fa6">Grosor:</label>
+        <input type="range" id="grosor-${id}" min="1" max="6" value="2" style="width:70px">
+        <input type="color" id="color-${id}" value="#4F7CAC" style="width:28px;height:22px;border:none;cursor:pointer;border-radius:3px">
+      </div>
+    </div>
+    <div class="firma-panel" id="fpanel-upload-${id}">
+      <button class="foto-btn" onclick="document.getElementById('firma-input-${id}').click()">Cargar imagen de firma</button>
+      <input type="file" id="firma-input-${id}" accept="image/*" style="display:none" onchange="cargarFirmaImg(${id},this)">
+      <img id="firma-img-${id}" class="firma-img-preview" alt="Firma">
+    </div>
+
+    <!-- ADJUNTOS -->
+    <div class="section-title">Documentos Adjuntos <span style="color:#e08a3c">*</span></div>
+    <div class="adjuntos-area" id="adjArea-${id}" onclick="document.getElementById('adj-input-${id}').click()">
+      <p>📎 Haz clic para adjuntar archivos</p>
+      <span>Selecciona imágenes (JPG, PNG) — ajusta cada imagen para que quede como deseas en la página del PDF</span>
+    </div>
+    <input type="file" id="adj-input-${id}" multiple accept=".jpg,.jpeg,.png" style="display:none" onchange="agregarAdjuntos(${id},this)">
+    <div class="adjuntos-list" id="adj-list-${id}"></div>
+
+    <div class="notas-box">
+      <strong>Nota:</strong> Cada anexo ocupa una página en el PDF. Usa el zoom y arrastra la imagen para ajustarla exactamente como quieres que aparezca. Los campos marcados con <span class="req">*</span>, la firma y al menos un documento adjunto son obligatorios para poder enviar la ficha.
+    </div>
+  </div>`;
+}
+
+// ── TOGGLE ──
+function toggleAsesor(id){
+  const body = document.getElementById(`body-${id}`);
+  const btn = document.querySelector(`#asesor-${id} .collapse-btn`);
+  if(body.classList.contains('collapsed')){
+    body.classList.remove('collapsed');
+    btn.textContent = 'Minimizar ▲';
+  } else {
+    body.classList.add('collapsed');
+    btn.textContent = 'Expandir ▼';
+  }
+}
+
+function delAsesor(id){
+  if(!confirm('¿Eliminar este asesor?')) return;
+  document.getElementById(`asesor-${id}`).remove();
+}
+
+function updatePreview(id){
+  const el = document.getElementById(`preview-${id}`);
+  const nombre = (document.getElementById(`nombre-${id}`)||{}).value||'';
+  el.textContent = nombre || 'Sin nombre aún';
+}
+
+// ── FACULTAD (listbox con opción "Otra") ──
+function onFacultadChange(id){
+  const sel = document.getElementById(`facultad-${id}`);
+  const wrap = document.getElementById(`otraFacultadWrap-${id}`);
+  if(sel.value === 'Otra (especificar)'){
+    wrap.classList.add('show');
+  } else {
+    wrap.classList.remove('show');
+  }
+}
+
+function getFacultadValor(id){
+  const sel = document.getElementById(`facultad-${id}`);
+  if(!sel) return '';
+  if(sel.value === 'Otra (especificar)'){
+    return (document.getElementById(`facultadOtra-${id}`)||{}).value||'';
+  }
+  return sel.value||'';
+}
+
+// ── TABLE ROWS ──
+function addTableRow(id, type){
+  const tbody = document.getElementById(`tbl${type}-${id}`);
+  const n = tbody.rows.length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = buildRow(id, type, n, n);
+  tbody.appendChild(tr);
+  renumberTable(`tbl${type}-${id}`);
+}
+
+// Defaults por fila para cada tabla (filas 1,2,3)
+const formacionDefaults = ['Licenciatura','Ingeniería','Especialidad','Maestría','Doctorado'];
+const estudiosDefaults  = ['Curso','Taller','Seminario'];
+const expDefaults       = ['Investigador','Asesor de investigación','Jurado de Tesis'];
+
+function buildRow(id, type, n, rowIndex){
+  const ri = (rowIndex !== undefined ? rowIndex : n) - 1; // 0-based
+  if(type==='Formacion'){
+    const def = formacionDefaults[ri] !== undefined ? formacionDefaults[ri] : gradoOpts[0];
+    return `
+    <td class="row-num">${n}</td>
+    <td><select style="font-size:8.5pt">${gradoOpts.map(o=>`<option${o===def?' selected':''}>${o}</option>`).join('')}</select></td>
+    <td><input type="text" placeholder="Área de especialización"></td>
+    <td><input type="text" placeholder="Año" style="width:58px"></td>
+    <td><input type="text" placeholder="Institución"></td>
+    <td><button class="del-row-btn" onclick="delRow(this,'tbl${type}-${id}')">×</button></td>`;}
+  if(type==='Estudios'){
+    const def = estudiosDefaults[ri] !== undefined ? estudiosDefaults[ri] : modalOpts[0];
+    return `
+    <td class="row-num">${n}</td>
+    <td><select style="font-size:8.5pt">${modalOpts.map(o=>`<option${o===def?' selected':''}>${o}</option>`).join('')}</select></td>
+    <td><input type="text" placeholder="Nombre del estudio / certificación"></td>
+    <td><input type="text" placeholder="Año" style="width:58px"></td>
+    <td><input type="text" placeholder="Institución"></td>
+    <td><button class="del-row-btn" onclick="delRow(this,'tbl${type}-${id}')">×</button></td>`;}
+  if(type==='Experiencia'){
+    const def = expDefaults[ri] !== undefined ? expDefaults[ri] : expOpts[0];
+    return `
+    <td class="row-num">${n}</td>
+    <td><select style="font-size:8.5pt">${expOpts.map(o=>`<option${o===def?' selected':''}>${o}</option>`).join('')}</select></td>
+    <td><input type="text" placeholder="Años" style="width:70px"></td>
+    <td><input type="text" placeholder="Institución(es)"></td>
+    <td><button class="del-row-btn" onclick="delRow(this,'tbl${type}-${id}')">×</button></td>`;}
+  if(type==='Publicaciones') return `
+    <td class="row-num">${n}</td>
+    <td><input type="text" placeholder="Título completo de la publicación"></td>
+    <td><input type="text" placeholder="Revista o Editorial"></td>
+    <td><input type="text" placeholder="Año" style="width:58px"></td>
+    <td><button class="del-row-btn" onclick="delRow(this,'tbl${type}-${id}')">×</button></td>`;
+}
+
+function delRow(btn, tbodyId){
+  btn.closest('tr').remove();
+  renumberTable(tbodyId);
+}
+function renumberTable(tbodyId){
+  document.querySelectorAll(`#${tbodyId} .row-num`).forEach((td,i)=>td.textContent=i+1);
+}
+
+// ── FOTO ──
+const fotoData = {};
+function cargarFoto(id, input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    fotoData[id] = e.target.result;
+    const img = document.getElementById(`foto-img-${id}`);
+    img.src = fotoData[id]; img.style.display='block';
+    document.getElementById(`foto-ph-${id}`).style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── CANVAS ──
+const canvasState = {};
+function initCanvas(id){
+  const canvas = document.getElementById(`canvas-${id}`);
+  if(!canvas) return;
+  canvasState[id] = {drawing:false, lastX:0, lastY:0};
+  const ctx = canvas.getContext('2d');
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const sx = canvas.width/r.width, sy = canvas.height/r.height;
+    if(e.touches) return [(e.touches[0].clientX-r.left)*sx,(e.touches[0].clientY-r.top)*sy];
+    return [(e.clientX-r.left)*sx,(e.clientY-r.top)*sy];
+  };
+  const draw = e => {
+    if(!canvasState[id].drawing) return;
+    const [x,y] = getPos(e);
+    ctx.beginPath(); ctx.moveTo(canvasState[id].lastX, canvasState[id].lastY);
+    ctx.lineTo(x,y);
+    ctx.strokeStyle = document.getElementById(`color-${id}`).value;
+    ctx.lineWidth = document.getElementById(`grosor-${id}`).value;
+    ctx.lineCap='round'; ctx.stroke();
+    canvasState[id].lastX=x; canvasState[id].lastY=y;
+    limpiarErrorFirma(id);
+  };
+  canvas.addEventListener('mousedown', e=>{canvasState[id].drawing=true;[canvasState[id].lastX,canvasState[id].lastY]=getPos(e)});
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', ()=>canvasState[id].drawing=false);
+  canvas.addEventListener('mouseleave', ()=>canvasState[id].drawing=false);
+  canvas.addEventListener('touchstart', e=>{e.preventDefault();canvasState[id].drawing=true;[canvasState[id].lastX,canvasState[id].lastY]=getPos(e)},{passive:false});
+  canvas.addEventListener('touchmove', e=>{e.preventDefault();draw(e)},{passive:false});
+  canvas.addEventListener('touchend', ()=>canvasState[id].drawing=false);
+}
+function clearCanvas(id){ const c=document.getElementById(`canvas-${id}`); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+
+// ── FIRMA IMG ──
+const firmaImgData = {};
+function cargarFirmaImg(id, input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    firmaImgData[id] = e.target.result;
+    const img = document.getElementById(`firma-img-${id}`);
+    img.src = firmaImgData[id]; img.style.display='block';
+    limpiarErrorFirma(id);
+  };
+  reader.readAsDataURL(file);
+}
+function switchFirma(id, type){
+  document.getElementById(`ftab-draw-${id}`).classList.toggle('active', type==='draw');
+  document.getElementById(`ftab-upload-${id}`).classList.toggle('active', type==='upload');
+  document.getElementById(`fpanel-draw-${id}`).classList.toggle('active', type==='draw');
+  document.getElementById(`fpanel-upload-${id}`).classList.toggle('active', type==='upload');
+}
+
+// ── VALIDACIÓN DE CAMPOS OBLIGATORIOS Y FIRMA ──
+function limpiarErrorCampo(el){
+  if(el) el.classList.remove('field-error');
+}
+function limpiarErrorFirma(id){
+  const p1 = document.getElementById(`fpanel-draw-${id}`);
+  const p2 = document.getElementById(`fpanel-upload-${id}`);
+  if(p1) p1.classList.remove('field-error');
+  if(p2) p2.classList.remove('field-error');
+}
+function limpiarErrores(){
+  document.querySelectorAll('.field-error').forEach(el=>el.classList.remove('field-error'));
+}
+
+function tieneFirma(id){
+  const sigCanvas = document.getElementById(`canvas-${id}`);
+  if(sigCanvas){
+    const blank = document.createElement('canvas');
+    blank.width = sigCanvas.width; blank.height = sigCanvas.height;
+    if(sigCanvas.toDataURL() !== blank.toDataURL()) return true;
+  }
+  if(firmaImgData[id]) return true;
+  return false;
+}
+
+// Campos obligatorios de datos personales (además de la firma)
+const camposObligatorios = [
+  {key:'nombre', label:'Nombre y Apellidos'},
+  {key:'cedula', label:'Cédula'},
+  {key:'tel', label:'Teléfono'},
+  {key:'correo', label:'Correo Institucional'},
+  {key:'tipo', label:'Tipo de Asesor'},
+  {key:'facultad', label:'Facultad'},
+  {key:'programa', label:'Programa Académico'}
+];
+
+function irYResaltar(el){
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  el.classList.add('field-error');
+  if(typeof el.focus === 'function') el.focus();
+}
+
+// Valida el formulario completo. Si algo falta, expande la tarjeta correspondiente,
+// hace scroll exactamente al campo/área faltante, la resalta en rojo y detiene el envío.
+function validarFormulario(){
+  limpiarErrores();
+
+  const coordNombre = document.getElementById('coordNombre');
+  if(!coordNombre.value.trim()){
+    irYResaltar(coordNombre);
+    alert('Por favor ingresa el nombre del coordinador responsable.');
+    return false;
+  }
+
+  const cards = document.querySelectorAll('.asesor-card');
+  if(!cards.length){
+    alert('Por favor agrega al menos un asesor.');
+    return false;
+  }
+
+  for(const card of cards){
+    const id = card.id.replace('asesor-','');
+    const numLabel = card.querySelector('.asesor-num').textContent;
+
+    // Expandir la tarjeta si está minimizada, para poder ver y llegar a los campos
+    const body = document.getElementById(`body-${id}`);
+    const estabaColapsada = body.classList.contains('collapsed');
+    if(estabaColapsada) toggleAsesor(id);
+
+    // 1. Campos de datos obligatorios
+    for(const f of camposObligatorios){
+      const el = document.getElementById(`${f.key}-${id}`);
+      let valor;
+      if(f.key === 'facultad'){
+        valor = getFacultadValor(id);
+      } else {
+        valor = el ? el.value : '';
+      }
+      if(!valor || !valor.trim()){
+        irYResaltar(el);
+        alert(`${numLabel}: falta completar el campo obligatorio "${f.label}".`);
+        return false;
+      }
+    }
+
+    // 2. Firma obligatoria
+    if(!tieneFirma(id)){
+      const panelActivoId = document.querySelector(`#asesor-${id} .firma-tab.active`).id.includes('draw') ? `fpanel-draw-${id}` : `fpanel-upload-${id}`;
+      const target = document.getElementById(panelActivoId);
+      target.scrollIntoView({behavior:'smooth', block:'center'});
+      target.classList.add('field-error');
+      alert(`${numLabel}: falta la firma. Por favor dibújala o carga una imagen de la firma antes de enviar.`);
+      return false;
+    }
+
+    // 3. Al menos un documento adjunto obligatorio
+    if(!(adjuntosData[id] && adjuntosData[id].length)){
+      const area = document.getElementById(`adjArea-${id}`);
+      area.scrollIntoView({behavior:'smooth', block:'center'});
+      area.classList.add('field-error');
+      alert(`${numLabel}: falta adjuntar al menos un documento. Por favor carga los archivos requeridos antes de enviar.`);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// ── ADJUNTOS ──
+// Relación de aspecto página: 7.5 x 9.5 pulgadas
+const ADJ_RATIO = 11 / 8.5;
+const ADJ_DISPLAY_W = 480; // px en pantalla
+const ADJ_DISPLAY_H = Math.round(ADJ_DISPLAY_W * ADJ_RATIO); // 621px
+
+const adjuntosData = {};   // { [asesorId]: [ {file, imgEl, state} ] }
+
+function agregarAdjuntos(id, input){
+  if(!adjuntosData[id]) adjuntosData[id]=[];
+  Array.from(input.files).forEach(f=>{
+    if(adjuntosData[id].find(a=>a.file.name===f.name&&a.file.size===f.size)) return;
+    const url = URL.createObjectURL(f);
+    const imgEl = new Image();
+    imgEl.onload = () => {
+      const entry = {
+        file: f,
+        imgEl: imgEl,
+        url: url,
+        // estado del editor: escala, desplazamiento y rotación
+        state: { scale: 1, ox: 0, oy: 0, rot: 0 }
+      };
+      // Escala inicial: ajustar para que la imagen llene el marco
+      const scaleX = ADJ_DISPLAY_W / imgEl.naturalWidth;
+      const scaleY = ADJ_DISPLAY_H / imgEl.naturalHeight;
+      entry.state.scale = Math.min(scaleX, scaleY);
+      entry.state.ox = (ADJ_DISPLAY_W - imgEl.naturalWidth * entry.state.scale) / 2;
+      entry.state.oy = (ADJ_DISPLAY_H - imgEl.naturalHeight * entry.state.scale) / 2;
+      adjuntosData[id].push(entry);
+      renderAdjuntos(id);
+      const area = document.getElementById(`adjArea-${id}`);
+      if(area) area.classList.remove('field-error');
+    };
+    imgEl.src = url;
+  });
+  input.value='';
+}
+
+function renderAdjuntos(id){
+  const list = document.getElementById(`adj-list-${id}`);
+  const items = adjuntosData[id]||[];
+  list.innerHTML = '';
+  items.forEach((entry, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'adj-item';
+    wrap.innerHTML = `
+      <div class="adj-item-header">
+        <span>📄 ${entry.file.name} <span style="color:#b0b8c4">(${(entry.file.size/1024).toFixed(1)} KB)</span></span>
+        <button class="adj-del-btn" onclick="removeAdj(${id},${i})">×</button>
+      </div>
+      <div class="adj-editor-wrap">
+        <div class="adj-editor-label">Vista previa — arrastra y ajusta el zoom para encuadrar la imagen en la página PDF</div>
+        <div class="adj-page-frame" id="adj-frame-${id}-${i}" style="width:${ADJ_DISPLAY_W}px;height:${ADJ_DISPLAY_H}px">
+          <canvas id="adj-canvas-${id}-${i}" width="${ADJ_DISPLAY_W}" height="${ADJ_DISPLAY_H}"></canvas>
+        </div>
+        <div class="adj-controls">
+          <span class="adj-zoom-label">Zoom:</span>
+          <input class="adj-zoom-range" type="range" min="10" max="300" value="${Math.round(entry.state.scale*100)}"
+            oninput="adjZoom(${id},${i},this.value)">
+          <button class="adj-ctrl-btn" onclick="adjFit(${id},${i})">⊡ Ajustar</button>
+          <button class="adj-ctrl-btn" onclick="adjFill(${id},${i})">⛶ Llenar</button>
+          <button class="adj-ctrl-btn" onclick="adjCenter(${id},${i})">⊙ Centrar</button>
+          <button class="adj-ctrl-btn" onclick="adjRotate(${id},${i},-90)">↺ 90°</button>
+          <button class="adj-ctrl-btn" onclick="adjRotate(${id},${i},90)">↻ 90°</button>
+        </div>
+      </div>`;
+    list.appendChild(wrap);
+
+    // Dibujar y agregar drag
+    setTimeout(() => {
+      drawAdjCanvas(id, i);
+      initAdjDrag(id, i);
+    }, 0);
+  });
+}
+
+// Función de renderizado compartida — usada tanto para pantalla como para exportar
+// scaleFactor: 1 para pantalla, REAL_W/ADJ_DISPLAY_W para exportar
+function renderAdjToCanvas(canvas, imgEl, state, scaleFactor){
+  const W = canvas.width;
+  const H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  const {scale, ox, oy, rot} = state;
+  const rad = (rot || 0) * Math.PI / 180;
+  const sf = scaleFactor || 1;
+
+  // Centro de la imagen en coordenadas de pantalla, escalado al canvas destino
+  const cx = (ox + imgEl.naturalWidth  * scale / 2) * sf;
+  const cy = (oy + imgEl.naturalHeight * scale / 2) * sf;
+  const drawW = imgEl.naturalWidth  * scale * sf;
+  const drawH = imgEl.naturalHeight * scale * sf;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rad);
+  ctx.drawImage(imgEl, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
+}
+
+function drawAdjCanvas(id, i){
+  const entry = (adjuntosData[id]||[])[i];
+  if(!entry) return;
+  const canvas = document.getElementById(`adj-canvas-${id}-${i}`);
+  if(!canvas) return;
+  renderAdjToCanvas(canvas, entry.imgEl, entry.state, 1);
+  // Borde decorativo
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = 'rgba(217,168,62,0.5)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, ADJ_DISPLAY_W-2, ADJ_DISPLAY_H-2);
+}
+
+function initAdjDrag(id, i){
+  const frame = document.getElementById(`adj-frame-${id}-${i}`);
+  if(!frame) return;
+  let dragging = false, startX, startY, startOx, startOy;
+
+  const onDown = e => {
+    dragging = true;
+    const pt = e.touches ? e.touches[0] : e;
+    startX = pt.clientX; startY = pt.clientY;
+    const entry = (adjuntosData[id]||[])[i];
+    startOx = entry.state.ox; startOy = entry.state.oy;
+    e.preventDefault();
+  };
+  const onMove = e => {
+    if(!dragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = pt.clientX - startX;
+    const dy = pt.clientY - startY;
+    const entry = (adjuntosData[id]||[])[i];
+    entry.state.ox = startOx + dx;
+    entry.state.oy = startOy + dy;
+    drawAdjCanvas(id, i);
+    e.preventDefault();
+  };
+  const onUp = () => { dragging = false; };
+
+  frame.addEventListener('mousedown', onDown);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+  frame.addEventListener('touchstart', onDown, {passive:false});
+  window.addEventListener('touchmove', onMove, {passive:false});
+  window.addEventListener('touchend', onUp);
+
+  // Wheel zoom
+  frame.addEventListener('wheel', e => {
+    e.preventDefault();
+    const entry = (adjuntosData[id]||[])[i];
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    const newScale = Math.max(0.1, Math.min(3, entry.state.scale + delta));
+    // Zoom centrado en el cursor
+    const rect = frame.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    entry.state.ox = mx - (mx - entry.state.ox) * (newScale / entry.state.scale);
+    entry.state.oy = my - (my - entry.state.oy) * (newScale / entry.state.scale);
+    entry.state.scale = newScale;
+    drawAdjCanvas(id, i);
+    // Sincronizar slider
+    const slider = frame.parentElement.querySelector('.adj-zoom-range');
+    if(slider) slider.value = Math.round(newScale * 100);
+  }, {passive:false});
+}
+
+function adjZoom(id, i, val){
+  const entry = (adjuntosData[id]||[])[i];
+  if(!entry) return;
+  const newScale = val / 100;
+  // Zoom centrado en la imagen
+  const cx = ADJ_DISPLAY_W / 2;
+  const cy = ADJ_DISPLAY_H / 2;
+  entry.state.ox = cx - (cx - entry.state.ox) * (newScale / entry.state.scale);
+  entry.state.oy = cy - (cy - entry.state.oy) * (newScale / entry.state.scale);
+  entry.state.scale = newScale;
+  drawAdjCanvas(id, i);
+}
+
+function adjFit(id, i){
+  const entry = (adjuntosData[id]||[])[i];
+  if(!entry) return;
+  const scaleX = ADJ_DISPLAY_W / entry.imgEl.naturalWidth;
+  const scaleY = ADJ_DISPLAY_H / entry.imgEl.naturalHeight;
+  entry.state.scale = Math.min(scaleX, scaleY);
+  adjCenter(id, i);
+}
+
+function adjFill(id, i){
+  const entry = (adjuntosData[id]||[])[i];
+  if(!entry) return;
+  const scaleX = ADJ_DISPLAY_W / entry.imgEl.naturalWidth;
+  const scaleY = ADJ_DISPLAY_H / entry.imgEl.naturalHeight;
+  entry.state.scale = Math.max(scaleX, scaleY);
+  adjCenter(id, i);
+}
+
+function adjCenter(id, i){
+  const entry = (adjuntosData[id]||[])[i];
+  if(!entry) return;
+  entry.state.ox = (ADJ_DISPLAY_W - entry.imgEl.naturalWidth * entry.state.scale) / 2;
+  entry.state.oy = (ADJ_DISPLAY_H - entry.imgEl.naturalHeight * entry.state.scale) / 2;
+  drawAdjCanvas(id, i);
+  // Sincronizar slider
+  const frame = document.getElementById(`adj-frame-${id}-${i}`);
+  if(frame){
+    const slider = frame.parentElement.querySelector('.adj-zoom-range');
+    if(slider) slider.value = Math.round(entry.state.scale * 100);
+  }
+}
+
+function adjRotate(id, i, deg){
+  const entry = (adjuntosData[id]||[])[i];
+  if(!entry) return;
+  entry.state.rot = ((entry.state.rot || 0) + deg + 360) % 360;
+  drawAdjCanvas(id, i);
+}
+
+function removeAdj(id,i){
+  adjuntosData[id].splice(i,1);
+  renderAdjuntos(id);
+}
+
+// ── GET DATA ──
+function getTableText(tbodyId){
+  const rows=[];
+  document.querySelectorAll(`#${tbodyId} tr`).forEach(tr=>{
+    const vals=Array.from(tr.querySelectorAll('input,select')).map(c=>c.value||'—');
+    if(vals.length) rows.push(vals.join(' | '));
+  });
+  return rows;
+}
+
+function buildBody(){
+  const v = id => (document.getElementById(id)||{}).value||'';
+  let body = `##INICIO##\n`;
+  body += `##COORDINADOR##${v('coordNombre')}##\n`;
+  body += `##PROGRAMA_COORD##${v('coordPrograma')}##\n`;
+  body += `##FECHA##${v('coordFecha')}##\n\n`;
+
+  document.querySelectorAll('.asesor-card').forEach((card,idx)=>{
+    const id = card.id.replace('asesor-','');
+    body += `========== ASESOR ${idx+1} ==========\n`;
+    body += `Nombre: ${v(`nombre-${id}`)}\n`;
+    body += `Cédula: ${v(`cedula-${id}`)} | ID: ${v(`idInst-${id}`)}\n`;
+    body += `Teléfono: ${v(`tel-${id}`)} | Correo: ${v(`correo-${id}`)}\n`;
+    body += `Tipo: ${v(`tipo-${id}`)} | Facultad: ${getFacultadValor(id)}\n`;
+    body += `Programa: ${v(`programa-${id}`)}\n\n`;
+    body += `-- Formación Académica --\n`;
+    getTableText(`tblFormacion-${id}`).forEach((r,i)=>body+=`${i+1}. ${r}\n`);
+    body += `\n-- Otros Estudios --\n`;
+    getTableText(`tblEstudios-${id}`).forEach((r,i)=>body+=`${i+1}. ${r}\n`);
+    body += `\n-- Experiencia --\n`;
+    getTableText(`tblExperiencia-${id}`).forEach((r,i)=>body+=`${i+1}. ${r}\n`);
+    body += `\n-- Publicaciones --\n`;
+    getTableText(`tblPublicaciones-${id}`).forEach((r,i)=>body+=`${i+1}. ${r}\n`);
+    const adjs = adjuntosData[id]||[];
+    if(adjs.length){
+      body += `\n-- Adjuntos (${adjs.length}) --\n`;
+      adjs.forEach(f=>body+=`• ${f.name}\n`);
+    }
+    body += `\n`;
+  });
+
+  body += `##FIN##`;
+  return body;
+}
+
+// ── ENVIAR ──
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxYdYeiq27HwEQqTBTVFvZnUJEVoE1iGeuOwIvXimiR9kvs27GhGLl9znqooM2gNyPHtQ/exec';
+
+// Construye un PDF completo por asesor en el navegador usando jsPDF
+// Página 1: ficha HTML renderizada | Páginas 2+: cada adjunto exacto
+async function buildAsesorPDF(coord, programa, fecha, asesor, numAsesor){
+  const { jsPDF } = window.jspdf;
+  // Página tamaño carta en puntos (72dpi): 612 x 792 pt
+  const pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+
+  // ── Página 1: Ficha como imagen desde HTML ──
+  // Construimos un iframe oculto, lo renderizamos en canvas con html2canvas
+  // Pero html2canvas no está disponible — usamos jsPDF directo con texto/líneas
+
+  // Encabezado
+  const W = 612, M = 40;
+  let y = M;
+  const cw = W - M*2;
+
+  // Logo área / encabezado
+  pdf.setFillColor(26,46,74);
+  pdf.rect(M, y, cw, 28, 'F');
+  pdf.setTextColor(255,255,255);
+  pdf.setFontSize(11); pdf.setFont('helvetica','bold');
+  pdf.text('PONTIFICIA UNIVERSIDAD CATÓLICA MADRE Y MAESTRA', W/2, y+11, {align:'center'});
+  pdf.setFontSize(8);
+  pdf.text('DECANATO DE POSTGRADO — FICHA DEL ASESOR DE INVESTIGACIÓN DE POSTGRADO', W/2, y+22, {align:'center'});
+  y += 36;
+
+  // Barra coordinador
+  pdf.setFillColor(237,241,246);
+  pdf.rect(M, y, cw, 18, 'F');
+  pdf.setTextColor(26,46,74); pdf.setFontSize(8); pdf.setFont('helvetica','normal');
+  pdf.text(`Coordinador: ${coord}    Programa: ${programa}    Fecha: ${fecha}`, M+6, y+12);
+  y += 26;
+
+  // Nombre asesor
+  pdf.setFillColor(192,131,42);
+  pdf.rect(M, y, 4, 20, 'F');
+  pdf.setFillColor(237,241,246);
+  pdf.rect(M+4, y, cw-4, 20, 'F');
+  pdf.setTextColor(26,46,74); pdf.setFontSize(11); pdf.setFont('helvetica','bold');
+  pdf.text(`ASESOR ${numAsesor}: ${asesor.nombre||''}`, M+12, y+14);
+  y += 28;
+
+  // Foto si existe
+  const fotoX = M;
+  if(asesor.foto){
+    try { pdf.addImage(asesor.foto, 'JPEG', fotoX, y, 72, 86); } catch(e){}
+  }
+  const dataX = asesor.foto ? M+80 : M;
+  const dataW = asesor.foto ? cw-80 : cw;
+
+  // Sección datos personales
+  function sectionBar(label, yy){
+    pdf.setFillColor(26,46,74);
+    pdf.rect(dataX, yy, dataW, 14, 'F');
+    pdf.setFillColor(192,131,42);
+    pdf.rect(dataX, yy, 3, 14, 'F');
+    pdf.setTextColor(255,255,255); pdf.setFontSize(7); pdf.setFont('helvetica','bold');
+    pdf.text(label, dataX+8, yy+10);
+    return yy+18;
+  }
+  function dataRow(label, val, yy, x, w){
+    pdf.setTextColor(80,80,80); pdf.setFontSize(7.5); pdf.setFont('helvetica','bold');
+    pdf.text(label, x, yy);
+    pdf.setTextColor(0,0,0); pdf.setFont('helvetica','normal');
+    pdf.text(String(val||''), x+90, yy);
+    pdf.setDrawColor(220,220,220);
+    pdf.line(x, yy+2, x+w, yy+2);
+    return yy+14;
+  }
+
+  let dy = sectionBar('DATOS PERSONALES', y);
+  dy = dataRow('Nombre y Apellidos:', asesor.nombre||'', dy, dataX, dataW);
+  dy = dataRow('Cédula:', asesor.cedula||'', dy, dataX, dataW/2);
+  // ID en la misma fila
+  pdf.setTextColor(80,80,80); pdf.setFontSize(7.5); pdf.setFont('helvetica','bold');
+  pdf.text('ID Institucional:', dataX+dataW/2, dy-14);
+  pdf.setTextColor(0,0,0); pdf.setFont('helvetica','normal');
+  pdf.text(String(asesor.idInst||''), dataX+dataW/2+90, dy-14);
+  dy = dataRow('Teléfono:', asesor.tel||'', dy, dataX, dataW/2);
+  pdf.setTextColor(80,80,80); pdf.setFont('helvetica','bold');
+  pdf.text('Correo:', dataX+dataW/2, dy-14);
+  pdf.setTextColor(0,0,0); pdf.setFont('helvetica','normal');
+  pdf.text(String(asesor.correo||''), dataX+dataW/2+90, dy-14);
+  dy = dataRow('Tipo de Asesor:', asesor.tipo||'', dy, dataX, dataW/2);
+  pdf.setTextColor(80,80,80); pdf.setFont('helvetica','bold');
+  pdf.text('Facultad:', dataX+dataW/2, dy-14);
+  pdf.setTextColor(0,0,0); pdf.setFont('helvetica','normal');
+  pdf.text(String(asesor.facultad||''), dataX+dataW/2+90, dy-14);
+  dy = dataRow('Programa que asesora:', asesor.programa||'', dy, dataX, dataW);
+
+  if(asesor.foto && dy < y+86) dy = y+90;
+  y = dy + 6;
+
+  // Función tabla
+  function drawTable(headers, rows, yy, cols){
+    const rowH = 14;
+    // Header
+    pdf.setFillColor(26,46,74);
+    pdf.rect(M, yy, cw, rowH, 'F');
+    pdf.setTextColor(255,255,255); pdf.setFontSize(7); pdf.setFont('helvetica','bold');
+    let xc = M+3;
+    headers.forEach((h,i)=>{ pdf.text(h, xc, yy+10); xc+=cols[i]; });
+    yy+=rowH;
+    rows.forEach((row,ri)=>{
+      pdf.setFillColor(ri%2===0?255:247,ri%2===0?255:249,ri%2===0?255:251);
+      pdf.rect(M, yy, cw, rowH, 'F');
+      pdf.setTextColor(0,0,0); pdf.setFont('helvetica','normal'); pdf.setFontSize(7);
+      xc = M+3;
+      row.forEach((cell,i)=>{
+        const txt = pdf.splitTextToSize(String(cell||''), cols[i]-4);
+        pdf.text(txt[0]||'', xc, yy+10);
+        xc+=cols[i];
+      });
+      pdf.setDrawColor(204,204,204);
+      pdf.line(M, yy+rowH, M+cw, yy+rowH);
+      yy+=rowH;
+    });
+    return yy+4;
+  }
+
+  if(asesor.formacion && asesor.formacion.length){
+    y = sectionBar('FORMACIÓN ACADÉMICA', y);
+    y = drawTable(['#','Grado','Área de Especialización','Año','Institución'],
+      asesor.formacion.map((r,i)=>[i+1,...r]), y, [20,90,200,40,182]);
+  }
+  if(asesor.estudios && asesor.estudios.length){
+    y = sectionBar('OTROS ESTUDIOS EN EL ÁREA INVESTIGATIVA', y);
+    y = drawTable(['#','Modalidad','Certificación / Descripción','Año','Institución'],
+      asesor.estudios.map((r,i)=>[i+1,...r]), y, [20,80,210,40,182]);
+  }
+  if(asesor.experiencia && asesor.experiencia.length){
+    y = sectionBar('EXPERIENCIA INVESTIGATIVA Y PROFESIONAL', y);
+    y = drawTable(['#','Función / Cargo','Años','Institución(es)'],
+      asesor.experiencia.map((r,i)=>[i+1,...r]), y, [20,200,60,252]);
+  }
+  if(asesor.publicaciones && asesor.publicaciones.length){
+    y = sectionBar('PUBLICACIONES CIENTÍFICAS O ACADÉMICAS', y);
+    y = drawTable(['#','Título','Revista o Editorial','Año'],
+      asesor.publicaciones.map((r,i)=>[i+1,...r]), y, [20,220,250,42]);
+  }
+
+  // Firma
+  if(asesor.firma){
+    y = sectionBar('FIRMA DEL ASESOR', y);
+    try { pdf.addImage(asesor.firma, 'PNG', M, y, 120, 40); } catch(e){}
+    y += 48;
+  }
+
+  // Footer
+  pdf.setDrawColor(204,204,204); pdf.line(M, 752, W-M, 752);
+  pdf.setTextColor(160,160,160); pdf.setFontSize(7); pdf.setFont('helvetica','normal');
+  pdf.text('Documento generado automáticamente — Decanato de Postgrado PUCMM', W/2, 762, {align:'center'});
+
+  return pdf;
+}
+
+async function enviar(){
+  if(!validarFormulario()) return;
+
+  const coord = document.getElementById('coordNombre').value.trim();
+
+  const btn = document.querySelector('.send-btn');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  try {
+    const programa = document.getElementById('coordPrograma').value||'';
+    const fecha    = document.getElementById('coordFecha').value||'';
+    const asesores = [];
+
+    for(const card of document.querySelectorAll('.asesor-card')){
+      const id = card.id.replace('asesor-','');
+      const gv = field => (document.getElementById(`${field}-${id}`)||{}).value||'';
+      const getRows = tbodyId => {
+        const rows = [];
+        document.querySelectorAll(`#${tbodyId} tr`).forEach(tr => {
+          const vals = Array.from(tr.querySelectorAll('input,select')).map(c=>c.value||'');
+          if(vals.length) rows.push(vals);
+        });
+        return rows;
+      };
+      let firma = null;
+      const sigCanvas = document.getElementById(`canvas-${id}`);
+      if(sigCanvas){
+        const blank = document.createElement('canvas');
+        blank.width = sigCanvas.width; blank.height = sigCanvas.height;
+        if(sigCanvas.toDataURL() !== blank.toDataURL()) firma = sigCanvas.toDataURL('image/png');
+      }
+      if(!firma && firmaImgData[id]) firma = firmaImgData[id];
+
+      // Exportar adjuntos desde el canvas del editor
+      const adjuntos = [];
+      for(const entry of (adjuntosData[id]||[])){
+        const tmpC = document.createElement('canvas');
+        tmpC.width  = ADJ_DISPLAY_W;
+        tmpC.height = ADJ_DISPLAY_H;
+        renderAdjToCanvas(tmpC, entry.imgEl, entry.state, 1);
+        adjuntos.push({
+          name: entry.file.name,
+          type: entry.file.type,
+          data: tmpC.toDataURL('image/jpeg', 0.92),
+          isLandscape: false
+        });
+      }
+
+      asesores.push({
+        nombre: gv('nombre'), cedula: gv('cedula'), idInst: gv('idInst'),
+        tel: gv('tel'), correo: gv('correo'), tipo: gv('tipo'),
+        facultad: getFacultadValor(id), programa: gv('programa'),
+        foto: fotoData[id]||null, firma: firma,
+        formacion: getRows(`tblFormacion-${id}`),
+        estudios:  getRows(`tblEstudios-${id}`),
+        experiencia: getRows(`tblExperiencia-${id}`),
+        publicaciones: getRows(`tblPublicaciones-${id}`),
+        adjuntos: adjuntos
+      });
+    }
+
+    const payload = {
+      coordinador: coord,
+      programa_coord: programa,
+      fecha: fecha,
+      asesores: asesores
+    };
+    await fetch(GAS_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    alert('✅ ¡Fichas enviadas exitosamente!\n\nAlexis Borges recibirá el PDF con foto, firma y anexos. Gabriel Ferreras recibirá copia.');
+  } catch(err){
+    console.error(err);
+    alert('❌ Error al enviar. Por favor intenta de nuevo.\n' + err.message);
+  } finally {
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Fichas';
+    btn.disabled = false;
+  }
+}
+
+function fileToDataURL(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Exporta dibujando el canvas de pantalla escalado al tamaño real de página
+// Esto garantiza pixel-perfect: lo que ves es exactamente lo que se envía
+function exportAdjCanvas(entry){
+  return new Promise(resolve => {
+    const REAL_W = 816;  // 8.5in * 96dpi
+    const REAL_H = 1056; // 11in * 96dpi
+
+    // Buscar el canvas de pantalla del editor
+    // No podemos buscarlo por ID aquí sin id/i, así que re-renderizamos
+    // en un canvas temporal de pantalla y luego escalamos
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width  = ADJ_DISPLAY_W;
+    tmpCanvas.height = ADJ_DISPLAY_H;
+    renderAdjToCanvas(tmpCanvas, entry.imgEl, entry.state, 1);
+
+    // Escalar el canvas de pantalla al tamaño real
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width  = REAL_W;
+    outCanvas.height = REAL_H;
+    const ctx = outCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, REAL_W, REAL_H);
+    // drawImage escala bilinealmente — pixel-perfect
+    ctx.drawImage(tmpCanvas, 0, 0, REAL_W, REAL_H);
+
+    resolve(outCanvas.toDataURL('image/jpeg', 0.95));
+  });
+}
+
+// Init with 1 asesor
+addAsesor();
+</script>
+</body>
+</html>
